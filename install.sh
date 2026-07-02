@@ -6,6 +6,8 @@
 # - Copies custom scripts into ~/.tmux/.
 # - Patches scripts/tmux-pop/pop.sh over the TPM-installed copy, since
 #   TPM would otherwise overwrite our tweaked version with upstream's.
+# - Symlinks kanagawa-tmux/ into ~/.tmux/plugins/, since it's a custom
+#   fork managed entirely in this repo rather than through TPM.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,5 +37,15 @@ else
     echo "tmux-pop not installed yet - run 'tmux' then prefix + I to install plugins,"
     echo "then re-run this script to patch scripts/tmux-pop/pop.sh into place."
 fi
+
+KANAGAWA_DIR="$TMUX_DIR/plugins/kanagawa-tmux"
+if [ -L "$KANAGAWA_DIR" ]; then
+    rm "$KANAGAWA_DIR"
+elif [ -d "$KANAGAWA_DIR" ]; then
+    rm -rf "$KANAGAWA_DIR"
+fi
+mkdir -p "$TMUX_DIR/plugins"
+ln -sf "$REPO_DIR/kanagawa-tmux" "$KANAGAWA_DIR"
+echo "Linked kanagawa-tmux -> $KANAGAWA_DIR"
 
 echo "Done."
