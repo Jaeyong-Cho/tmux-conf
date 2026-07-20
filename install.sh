@@ -48,4 +48,8 @@ mkdir -p "$TMUX_DIR/plugins"
 ln -sf "$REPO_DIR/kanagawa-tmux" "$KANAGAWA_DIR"
 echo "Linked kanagawa-tmux -> $KANAGAWA_DIR"
 
+# copy ./token-light to the $TMUX_DIR/themes/
+mkdir -p "$TMUX_DIR/themes"
+cp -rf "$REPO_DIR/token-light" "$TMUX_DIR/themes/token-light"
+
 echo "Done."
