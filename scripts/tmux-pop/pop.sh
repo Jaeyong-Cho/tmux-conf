@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
-tmux set -w window-active-style "bg=$1"
-sleep .02 && tmux set -w window-active-style ""
+color="$1"
+for _ in {1..3}; do
+  tmux set -w window-active-style "bg=$color"
+  sleep .05
+  tmux set -w window-active-style ""
+  sleep .05
+done

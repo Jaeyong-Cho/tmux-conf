@@ -4,8 +4,10 @@
 # - Symlinks .tmux.conf into place.
 # - Installs TPM if it isn't already present.
 # - Copies custom scripts into ~/.tmux/.
-# - Patches scripts/tmux-pop/pop.sh over the TPM-installed copy, since
-#   TPM would otherwise overwrite our tweaked version with upstream's.
+# - Patches scripts/tmux-pop/pop.sh and tmux_pop.tmux over the TPM-installed
+#   copies, since TPM would otherwise overwrite our tweaked versions with
+#   upstream's. tmux_pop.tmux fixes a quoting bug where a hex color's
+#   leading '#' gets parsed as a shell comment by run-shell.
 # - Symlinks kanagawa-tmux/ into ~/.tmux/plugins/, since it's a custom
 #   fork managed entirely in this repo rather than through TPM.
 set -euo pipefail
@@ -26,13 +28,14 @@ else
     echo "TPM already installed, skipping"
 fi
 
-TMUX_POP_SCRIPT="$TMUX_DIR/plugins/tmux-pop/scripts/pop.sh"
-if [ -d "$TMUX_DIR/plugins/tmux-pop" ]; then
-    install -m 755 "$REPO_DIR/scripts/tmux-pop/pop.sh" "$TMUX_POP_SCRIPT"
-    echo "Patched tmux-pop's pop.sh -> $TMUX_POP_SCRIPT"
+TMUX_POP_DIR="$TMUX_DIR/plugins/tmux-pop"
+if [ -d "$TMUX_POP_DIR" ]; then
+    install -m 755 "$REPO_DIR/scripts/tmux-pop/pop.sh" "$TMUX_POP_DIR/scripts/pop.sh"
+    install -m 755 "$REPO_DIR/scripts/tmux-pop/tmux_pop.tmux" "$TMUX_POP_DIR/tmux_pop.tmux"
+    echo "Patched tmux-pop's pop.sh and tmux_pop.tmux -> $TMUX_POP_DIR"
 else
     echo "tmux-pop not installed yet - run 'tmux' then prefix + I to install plugins,"
-    echo "then re-run this script to patch scripts/tmux-pop/pop.sh into place."
+    echo "then re-run this script to patch scripts/tmux-pop/ files into place."
 fi
 
 
