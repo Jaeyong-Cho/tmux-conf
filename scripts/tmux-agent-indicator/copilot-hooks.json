@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "command": "\"${TMUX_AGENT_INDICATOR_DIR:-$HOME/.tmux/plugins/tmux-agent-indicator}\"/scripts/agent-state.sh --agent copilot --state running"
+      }
+    ],
+    "permissionRequest": [
+      {
+        "type": "command",
+        "command": "\"${TMUX_AGENT_INDICATOR_DIR:-$HOME/.tmux/plugins/tmux-agent-indicator}\"/scripts/agent-state.sh --agent copilot --state needs-input"
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "command": "\"${TMUX_AGENT_INDICATOR_DIR:-$HOME/.tmux/plugins/tmux-agent-indicator}\"/scripts/agent-state.sh --agent copilot --state done"
+      }
+    ]
+  }
+}

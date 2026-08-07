@@ -10,6 +10,9 @@
 #   leading '#' gets parsed as a shell comment by run-shell.
 # - Symlinks kanagawa-tmux/ into ~/.tmux/plugins/, since it's a custom
 #   fork managed entirely in this repo rather than through TPM.
+# - Runs tmux-agent-indicator's own installer to wire Claude/Codex/OpenCode
+#   hooks, then installs a Copilot CLI hook file since that plugin has no
+#   native Copilot support upstream.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -58,5 +61,23 @@ cp -rf "$REPO_DIR/token-light" "$TMUX_DIR/themes/token-light"
 
 # Clean up old tmux-agent-status hooks
 rm -f "$HOME/.copilot/hooks/tmux-agent-status.json"
+
+# tmux-agent-indicator's installer wires its Claude/Codex/OpenCode hooks into
+# shared config files (~/.claude/settings.json, ~/.codex/hooks.json,
+# ~/.config/opencode/plugins/). It auto-skips agents that aren't installed
+# and de-dupes its own hook entries on re-run, so it's safe to run every time.
+if command -v curl >/dev/null 2>&1; then
+    curl -fsSL https://raw.githubusercontent.com/accessd/tmux-agent-indicator/main/install.sh | bash
+else
+    echo "curl not found, skipping tmux-agent-indicator's Claude/Codex/OpenCode hook setup"
+fi
+
+# tmux-agent-indicator has no native Copilot CLI integration, so install our
+# own hook file. agent-state.sh resolves the plugin dir from the
+# TMUX_AGENT_INDICATOR_DIR env var the plugin sets itself, so this file can
+# be copied as-is.
+mkdir -p "$HOME/.copilot/hooks"
+cp "$REPO_DIR/scripts/tmux-agent-indicator/copilot-hooks.json" "$HOME/.copilot/hooks/tmux-agent-indicator.json"
+echo "Installed Copilot CLI hooks -> $HOME/.copilot/hooks/tmux-agent-indicator.json"
 
 echo "Done."
