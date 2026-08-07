@@ -19,6 +19,9 @@ TPM_DIR="$TMUX_DIR/plugins/tpm"
 ln -sf "$REPO_DIR/.tmux.conf" "$HOME/.tmux.conf"
 echo "Linked .tmux.conf -> $HOME/.tmux.conf"
 
+ln -sf "$REPO_DIR/wezterm.lua" "$HOME/.wezterm.lua"
+echo "Linked wezterm.lua -> $HOME/.wezterm.lua"
+
 mkdir -p "$TMUX_DIR"
 
 if [ ! -d "$TPM_DIR" ]; then
