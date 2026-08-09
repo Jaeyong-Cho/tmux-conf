@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 color="$1"
-for _ in {1..3}; do
+for _ in {1..2}; do
   tmux set -w window-active-style "bg=$color"
   sleep .05
   tmux set -w window-active-style ""
