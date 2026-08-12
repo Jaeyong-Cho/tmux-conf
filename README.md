@@ -16,7 +16,7 @@ My tmux configuration, tracked in git. Plugins are managed by [TPM](https://gith
    git clone <this-repo-url> ~/workspace/tmux-conf
    ```
 
-2. Run the installer. It symlinks `.tmux.conf` and `wezterm.lua` into place, installs TPM if needed, copies the custom scripts into `~/.tmux/`, symlinks `kanagawa-tmux/` into `~/.tmux/plugins/`, runs tmux-agent-indicator's own installer (wires Claude Code/Codex/OpenCode hooks, auto-skipping agents not present), and installs the Copilot CLI hook:
+2. Run the installer. It symlinks `.tmux.conf` and `wezterm.lua` into place, installs TPM if needed, copies the custom scripts into `~/.tmux/`, symlinks `kanagawa-tmux/` into `~/.tmux/plugins/`, runs tmux-agent-indicator's own installer (wires Claude Code/Codex/OpenCode hooks, auto-skipping agents not present), and installs the Copilot CLI hook and pi extension:
 
    ```sh
    ~/workspace/tmux-conf/install.sh
@@ -40,6 +40,7 @@ My tmux configuration, tracked in git. Plugins are managed by [TPM](https://gith
 
 - `scripts/tmux-pop/pop.sh` — installed over `~/.tmux/plugins/tmux-pop/scripts/pop.sh`. A local tweak to the pane-flash duration/style; upstream TPM updates would otherwise clobber it, so `install.sh` re-patches it back in.
 - `scripts/tmux-agent-indicator/copilot-hooks.json` — installed to `~/.copilot/hooks/tmux-agent-indicator.json`. [tmux-agent-indicator](https://github.com/accessd/tmux-agent-indicator) has native hooks for Claude Code, Codex, and OpenCode but not Copilot CLI, so this wires `agent-state.sh` into Copilot's own hook events (`userPromptSubmitted`, `permissionRequest`, `agentStop`) the same way the plugin does for the others. `install.sh` also runs the plugin's own installer (via `curl | bash`) to wire up Claude Code/Codex/OpenCode, since merging into those shared config files is already handled safely upstream.
+- `scripts/tmux-agent-indicator/pi-extension.ts` — installed to `~/.pi/agent/extensions/tmux-agent-indicator.ts` (pi's global auto-discovered extension location). tmux-agent-indicator has no native pi ([earendil-works/pi](https://github.com/earendil-works/pi)) integration either, so this hooks pi's `before_agent_start` and `agent_settled` extension events into `agent-state.sh`. pi has no permission-prompt event (no permission popups by default), so only `running`/`done` are wired — no `needs-input`.
 
 ## Updating
 

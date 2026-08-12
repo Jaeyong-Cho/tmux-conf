@@ -11,8 +11,8 @@
 # - Symlinks kanagawa-tmux/ into ~/.tmux/plugins/, since it's a custom
 #   fork managed entirely in this repo rather than through TPM.
 # - Runs tmux-agent-indicator's own installer to wire Claude/Codex/OpenCode
-#   hooks, then installs a Copilot CLI hook file since that plugin has no
-#   native Copilot support upstream.
+#   hooks, then installs a Copilot CLI hook file and a pi extension since
+#   that plugin has no native Copilot or pi support upstream.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -79,5 +79,13 @@ fi
 mkdir -p "$HOME/.copilot/hooks"
 cp "$REPO_DIR/scripts/tmux-agent-indicator/copilot-hooks.json" "$HOME/.copilot/hooks/tmux-agent-indicator.json"
 echo "Installed Copilot CLI hooks -> $HOME/.copilot/hooks/tmux-agent-indicator.json"
+
+# tmux-agent-indicator has no native pi (earendil-works/pi) integration
+# either, so install our own extension. Global extensions at
+# ~/.pi/agent/extensions/*.ts are auto-discovered; agent-state.sh resolves
+# the plugin dir the same way as the Copilot hook above.
+mkdir -p "$HOME/.pi/agent/extensions"
+cp "$REPO_DIR/scripts/tmux-agent-indicator/pi-extension.ts" "$HOME/.pi/agent/extensions/tmux-agent-indicator.ts"
+echo "Installed pi coding agent extension -> $HOME/.pi/agent/extensions/tmux-agent-indicator.ts"
 
 echo "Done."
