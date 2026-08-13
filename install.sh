@@ -3,7 +3,9 @@
 #
 # - Symlinks .tmux.conf into place.
 # - Installs TPM if it isn't already present.
-# - Copies custom scripts into ~/.tmux/.
+# - Copies custom scripts into ~/.tmux/, including the centered-zoom toggle
+#   (prefix+z: power-zoom a pane into its own window, padded to
+#   @centered_zoom_width columns, like no-neck-pane.nvim).
 # - Patches scripts/tmux-pop/pop.sh and tmux_pop.tmux over the TPM-installed
 #   copies, since TPM would otherwise overwrite our tweaked versions with
 #   upstream's. tmux_pop.tmux fixes a quoting bug where a hex color's
@@ -44,6 +46,10 @@ else
     echo "then re-run this script to patch scripts/tmux-pop/ files into place."
 fi
 
+
+mkdir -p "$TMUX_DIR/scripts/centered-zoom"
+install -m 755 "$REPO_DIR/scripts/centered-zoom/toggle.sh" "$TMUX_DIR/scripts/centered-zoom/toggle.sh"
+echo "Installed centered-zoom toggle -> $TMUX_DIR/scripts/centered-zoom/toggle.sh"
 
 KANAGAWA_DIR="$TMUX_DIR/plugins/kanagawa-tmux"
 if [ -L "$KANAGAWA_DIR" ]; then
