@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Usage: tnew [name]  → create-or-attach a tmux session
+#        no arg       → session named after the current directory
+set -euo pipefail
+
+name="${1:-$(basename "$PWD")}"
+name="${name//[.:]/_}"
+
+if [ -n "${TMUX:-}" ]; then
+  tmux new-session -d -s "$name" 2>/dev/null || true
+  exec tmux switch-client -t "$name"
+else
+  exec tmux new-session -A -s "$name"
+fi

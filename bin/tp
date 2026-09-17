@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Usage: tp {0..4}  → jump to tmux pane by index
+exec tmux select-pane -t "$1"

@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Usage: tmux-split ts2  → left / right
+#        tmux-split 3   → left top+bottom, right 1
+#        tmux-split 4   → top 2, bottom 2
+#        tmux-split 5   → left 30% (3 stacked) / right 70% (2 stacked); right panes stay plain terminals
+#        tmux-split 5 claude|copilot|pi [pattern] → launch a model per left pane (top/middle/bottom)
+#          pattern: 3 tokens of o=opus s=sonnet h=haiku f=fable, each with an optional trailing y for
+#          yolo/skip-permissions (oy, sy, hy, fy), e.g. osh (default), ooo, or hysoy (haiku-yolo, sonnet, opus-yolo)
+
+ORIGIN=$(tmux display-message -p '#{pane_id}')
+
+case "${1:-}" in
+  ts2)
+    tmux split-window -h
+    tmux select-pane -t "$ORIGIN"
+    ;;
+  3)
+    tmux split-window -h
+    tmux select-pane -t "$ORIGIN"
+    tmux split-window -v
+    tmux select-pane -t "$ORIGIN"
+    ;;
+  4)
+    tmux split-window -v
+    tmux split-window -h
+    tmux select-pane -t "$ORIGIN"
+    tmux split-window -h
+    tmux select-pane -t "$ORIGIN"
+    ;;
+  5)
+    AGENT="${2:-}"
+    PATTERN="${3:-osh}"
+    LEFT_TOP="$ORIGIN"
+
+    RIGHT_TOP=$(tmux split-window -h -l 70% -P -F '#{pane_id}')
+    tmux split-window -v -t "$RIGHT_TOP" >/dev/null
+
+    LEFT_MIDDLE=$(tmux split-window -v -l 67% -t "$LEFT_TOP" -P -F '#{pane_id}')
+    LEFT_BOTTOM=$(tmux split-window -v -t "$LEFT_MIDDLE" -P -F '#{pane_id}')
+
+    tmux select-pane -t "$LEFT_TOP"
+
+    case "$AGENT" in
+      claude)  PREFIX=cc ;;
+      copilot) PREFIX=cg ;;
+      pi)      PREFIX=cp ;;
+      "")      PREFIX="" ;;
+      *)
+        echo "Unknown agent '$AGENT' (use claude|copilot|pi)" >&2
+        exit 1
+        ;;
+    esac
+
+    if [ -n "$PREFIX" ]; then
+      if [[ ! "$PATTERN" =~ ^([oshf]y?){3}$ ]]; then
+        echo "Unknown pattern '$PATTERN' (3 tokens of o/s/h/f, each with an optional trailing y for yolo, e.g. osh or hysoy)" >&2
+        exit 1
+      fi
+      rest="$PATTERN"
+      for pane in "$LEFT_TOP" "$LEFT_MIDDLE" "$LEFT_BOTTOM"; do
+        token="${rest:0:1}"
+        rest="${rest:1}"
+        if [ "${rest:0:1}" = "y" ]; then
+          token+="y"
+          rest="${rest:1}"
+        fi
+        [ "$token" = "sy" ] && token="y"
+        tmux send-keys -t "$pane" "${PREFIX}${token}" Enter
+      done
+    fi
+    ;;
+  *)
+    echo "Usage: tmux-split ts2|3|4|5 [claude|copilot|pi]"
+    echo "  ts2 → left / right"
+    echo "  3   → left top+bottom, right 1"
+    echo "  4   → top 2, bottom 2"
+    echo "  5   → left 30% (3 stacked) / right 70% (2 stacked)"
+    echo "  5 claude|copilot|pi [pattern] → launches models per left pane, e.g. osh, ooo, or hysoy"
+    exit 1
+    ;;
+esac

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Usage: tk [name]  → kill tmux session (current session if no arg)
+set -euo pipefail
+
+name="${1:-$(tmux display-message -p '#S')}"
+exec tmux kill-session -t "$name"

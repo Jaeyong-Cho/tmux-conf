@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Usage: ts5 [claude|copilot|pi] [pattern]
+#   pattern: 3 tokens of o=opus s=sonnet h=haiku f=fable, each with an optional trailing y for
+#   yolo/skip-permissions (oy, sy, hy, fy), one per left pane (top/middle/bottom)
+#   e.g. ts5 claude osh (default), ts5 claude ooo, ts5 claude hysoy
+agent=""
+pattern="osh"
+for arg in "$@"; do
+  if [[ "$arg" =~ ^([oshf]y?){3}$ ]]; then
+    pattern="$arg"
+  else
+    agent="$arg"
+  fi
+done
+if [ -z "$agent" ]; then
+  PS3="agent? "
+  select agent in claude copilot pi; do
+    [ -n "$agent" ] && break
+  done
+fi
+tmux-split 5 "$agent" "$pattern"
