@@ -29,6 +29,16 @@ echo "Linked wezterm.lua -> $HOME/.wezterm.lua"
 
 mkdir -p "$TMUX_DIR"
 
+if [ -d "$REPO_DIR/bin" ]; then
+    BIN_DIR="$HOME/.local/bin"
+    mkdir -p "$BIN_DIR"
+    for script in "$REPO_DIR/bin"/*; do
+        [ -f "$script" ] || continue
+        ln -sf "$script" "$BIN_DIR/$(basename "$script")"
+        echo "Linked $(basename "$script") -> $BIN_DIR/$(basename "$script")"
+    done
+fi
+
 if [ ! -d "$TPM_DIR" ]; then
     git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
     echo "Installed TPM -> $TPM_DIR"

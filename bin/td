@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Usage: td  → detach from the current tmux session
+exec tmux detach-client
